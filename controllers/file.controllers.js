@@ -4,59 +4,50 @@ const { apiError, apiResponse } = require("../utils/apiResponse");
 const { cloudinaryUpload, cloudinaryDelete } = require("../utils/cloudinary");
 const { hashPassword, comparePassword } = require("../utils/hashPassword");
 const { extractPublicId } = require("cloudinary-build-url");
+const setTimeOut = require("../utils/setTimeOutDelete");
 
 const postFile = async (req, res) => {
 	try {
 		const { id } = req.user;
 		const { path } = req.file;
 		const { password, isPasswordProtected, isFileShareable } = req.body;
-
-		const { secure_url } = await cloudinaryUpload(path);
-		const publicId = extractPublicId(secure_url);
-
-		let createFile;
+		let createFile, publicId;
 
 		const user = await User.findById(id);
-
-		if (!user) {
-			return res.send(404).json(apiError("User not found !!", false));
-		}
+		if (!user) return res.send(404).json(apiError("User not found !!", false));
 
 		if (isPasswordProtected) {
 			if (password) {
 				const hash = await hashPassword(password);
-				if (secure_url) {
-					createFile = new File({
-						userID: id,
-						fileName: secure_url,
-						password: hash,
-						isPasswordProtected,
-						isFileShareable: isFileShareable || true,
-					});
-				}
-			} else {
-				return res.send(500).json(apiError("Password is required !!", false));
-			}
-		} else {
-			if (secure_url) {
+				const { secure_url } = await cloudinaryUpload(path);
+				publicId = extractPublicId(secure_url);
+
 				createFile = new File({
 					userID: id,
 					fileName: secure_url,
+					password: hash,
+					isPasswordProtected,
 					isFileShareable: isFileShareable || true,
 				});
+			} else {
+				return res.status(500).json(apiError("Password is required !!", false));
 			}
+		} else {
+			const { secure_url } = await cloudinaryUpload(path);
+			publicId = extractPublicId(secure_url);
+
+			createFile = new File({
+				userID: id,
+				fileName: secure_url,
+				isFileShareable: isFileShareable || true,
+			});
 		}
 
 		const createdFile = await createFile.save();
 		user.files.push(createdFile._id);
 		await user.save();
 
-		setTimeout(async () => {
-			await cloudinaryDelete(publicId);
-			await File.findByIdAndDelete(createFile._id);
-			user.files.splice(user.files.indexOf(createFile._id), 1);
-			await user.save();
-		});
+		setTimeOut({ publicId, fileID: createdFile._id });
 
 		return res
 			.status(200)
@@ -64,7 +55,7 @@ const postFile = async (req, res) => {
 				apiResponse(
 					"File uploaded successfully, this w'll be deleted after 24 hours !!",
 					true,
-					{}
+					{ createdFile }
 				)
 			);
 	} catch (err) {
@@ -90,7 +81,7 @@ const getFile = async (req, res) => {
 
 		if (!findFile)
 			return res.status(404).json(apiError(`Data not found`, false));
-        
+
 		if (pass) {
 			const verifyPass = await comparePassword(pass, findFile.password);
 			if (verifyPass) {
