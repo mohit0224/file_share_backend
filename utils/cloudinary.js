@@ -13,6 +13,7 @@ const cloudinaryUpload = async (filePath) => {
 		const response = await cloudinary.uploader.upload(filePath, {
 			resource_type: "auto",
 		});
+
 		fs.unlinkSync(filePath);
 		return response;
 	} catch (err) {
@@ -21,9 +22,9 @@ const cloudinaryUpload = async (filePath) => {
 	}
 };
 
-const cloudinaryDelete = async (filePath) => {
+const cloudinaryDelete = async (publicID) => {
 	try {
-		const response = await cloudinary.uploader.destroy(filePath);
+		const response = await cloudinary.uploader.destroy(publicID);
 
 		return response;
 	} catch (err) {
@@ -31,4 +32,16 @@ const cloudinaryDelete = async (filePath) => {
 	}
 };
 
-module.exports = { cloudinaryUpload, cloudinaryDelete };
+const cloudinaryDownload = async (publicID) => {
+	try {
+		const response = await cloudinary.url(publicID, {
+			secure: true,
+		});
+
+		return response;
+	} catch (err) {
+		return err;
+	}
+};
+
+module.exports = { cloudinaryUpload, cloudinaryDelete, cloudinaryDownload };

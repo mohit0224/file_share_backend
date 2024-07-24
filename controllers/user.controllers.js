@@ -1,8 +1,9 @@
-const mongoose = require("mongoose");
 const User = require("../models/users.models");
 const { apiError, apiResponse } = require("../utils/apiResponse");
+const { cloudinaryDelete, cloudinaryUpload } = require("../utils/cloudinary");
 const { hashPassword, comparePassword } = require("../utils/hashPassword");
 const { generateToken } = require("../utils/jwtToken");
+const { extractPublicId } = require("cloudinary-build-url");
 
 const userCreate = async (req, res) => {
 	try {
@@ -45,7 +46,7 @@ const userCreate = async (req, res) => {
 
 		return res
 			.status(201)
-			.json(apiResponse("User created successfully !!", true, { userCreated }));
+			.json(apiResponse("User created successfully !!", true, userCreated));
 	} catch (err) {
 		return res
 			.status(500)
@@ -73,23 +74,29 @@ const userLogin = async (req, res) => {
 		const user = await User.findOne({
 			$or: [{ username: identifier }, { email: identifier }],
 		});
+
 		if (!user) {
 			return res.status(404).json(apiError(`User not found !!`, false));
 		}
 
-		await comparePassword(password, user.password);
+		const verifyPassword = await comparePassword(password, user.password);
+
+		if (!verifyPassword) {
+			return res.status(404).json(apiError("Invalid credentials", false));
+		}
 
 		const token = generateToken(user._id);
 
-		res.cookie("token", token, {
-			httpOnly: true,
-			self: true,
-			maxAge: 24 * 60 * 60 * 1000,
-		});
-
 		return res
 			.status(200)
-			.json(apiResponse("User logged in successfully !!", true, { user }));
+			.cookie("token", token, {
+				httpOnly: true,
+				self: true,
+				secure: true,
+				sameSite: "none",
+				maxAge: 24 * 60 * 60 * 1000,
+			})
+			.json(apiResponse("User logged in successfully !!", true, {}));
 	} catch (err) {
 		return res
 			.status(500)
@@ -99,15 +106,16 @@ const userLogin = async (req, res) => {
 
 const userLogout = async (req, res) => {
 	try {
-		res.cookie("token", "", {
-			httpOnly: true,
-			self: true,
-			maxAge: 0,
-		});
-
 		res
 			.status(200)
-			.json(apiResponse("User logged out successfully !!", true, {}));
+			.cookie("token", "", {
+				httpOnly: true,
+				self: true,
+				secure: true,
+				sameSite: "none",
+				maxAge: 0,
+			})
+			.json(apiResponse("logged out successfully !!", true, {}));
 	} catch (err) {
 		return res
 			.status(500)
@@ -117,7 +125,9 @@ const userLogout = async (req, res) => {
 
 const getSingleUser = async (req, res) => {
 	try {
-		const user = await User.findById(req.user.id).select("-password");
+		const user = await User.findById(req.user.id)
+			.select("-password")
+			.populate("files");
 
 		if (!user) {
 			return res.send("err");
@@ -133,9 +143,69 @@ const getSingleUser = async (req, res) => {
 	}
 };
 
+const changePassword = async (req, res) => {
+	try {
+		const user = await User.findById(req.user.id);
+		const { oldPassword, newPassword } = req.body;
+		if (!user)
+			return res.status(404).json(apiError("User not found !!", false));
+
+		const verifyPassword = await comparePassword(oldPassword, user.password);
+		if (!verifyPassword)
+			return res.status(404).json(apiError("Invalid password !!", false));
+
+		const newHashPassword = await hashPassword(newPassword);
+
+		user.password = newHashPassword;
+
+		await user.save();
+
+		return res
+			.status(200)
+			.json(apiResponse("Password has been changed !!", true, {}));
+	} catch (err) {
+		return res.status(500).json(apiError(err.message, false));
+	}
+};
+
+const updateProfileImage = async (req, res) => {
+	try {
+		const user = await User.findById(req.user.id);
+		if (!user)
+			return res.status(404).json(apiError("User not found !!", false));
+
+		const file = req.file;
+		if (!file)
+			return res.status(404).json(apiError("Upload profile image to process !!", false));
+
+		if (user.userImage) {
+			const publicID = extractPublicId(user.userImage);
+			await cloudinaryDelete(publicID);
+			const { secure_url } = await cloudinaryUpload(file.path);
+			user.userImage = secure_url;
+			await user.save();
+			return res
+				.status(200)
+				.json(apiResponse("Profile image updated !!", true, user));
+		}
+
+		const { secure_url } = await cloudinaryUpload(file.path);
+		user.userImage = secure_url;
+		await user.save();
+
+		return res
+			.status(200)
+			.json(apiResponse("Profile image updated !!", true, user));
+	} catch (err) {
+		return res.status(500).json(apiError(err.message, false));
+	}
+};
+
 module.exports = {
 	userCreate,
 	userLogin,
 	userLogout,
 	getSingleUser,
+	changePassword,
+	updateProfileImage,
 };

@@ -8,8 +8,10 @@ const userSchema = new mongoose.Schema(
 		},
 		name: {
 			type: "String",
-			unique: true,
 			required: true,
+		},
+		userImage: {
+			type: "String",
 		},
 		email: {
 			type: "String",

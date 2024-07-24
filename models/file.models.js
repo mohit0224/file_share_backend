@@ -6,7 +6,10 @@ const fileSchema = new mongoose.Schema(
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "user",
 		},
-		fileName: {
+		imageName: {
+			type: "String",
+		},
+		imageURL: {
 			type: "String",
 		},
 		password: {

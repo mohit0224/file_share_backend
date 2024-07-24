@@ -3,20 +3,35 @@ const path = require("path");
 
 const storage = multer.diskStorage({
 	destination: function (req, file, cb) {
-		cb(null, "./public");
+		cb(null, "./public/");
 	},
 	filename: function (req, file, cb) {
-		const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-
-		cb(
-			null,
-			`${file.originalname.split(".")[0]}-${uniqueSuffix}.${path.extname(
-				file.originalname
-			)}`
-		);
+		cb(null, `${file.originalname}`);
 	},
 });
 
-const upload = multer({ storage: storage });
+const fileFilter = (req, file, cb) => {
+	let ext = path.extname(file.originalname);
+	if (
+		ext !== ".png" &&
+		ext !== ".jpg" &&
+		ext !== ".gif" &&
+		ext !== ".jpeg" &&
+		ext !== ".webp"
+	) {
+		req.fileValidationError =
+			"Only images and gif files are allowed, file be like ( png, jpg, gif, jpeg, webp ) !!";
+		return cb(null, false, req.fileValidationError);
+	}
+	cb(null, true);
+};
+
+const fileSize = 5 * 1024 * 1024;
+
+const upload = multer({
+	storage,
+	fileFilter,
+	limits: { fileSize },
+});
 
 module.exports = upload;

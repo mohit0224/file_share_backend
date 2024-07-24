@@ -1,11 +1,38 @@
 const router = require("express").Router();
-const { postFile, getFile, deleteFile } = require("../controllers/file.controllers");
+
+const multer = require("multer");
+const {
+	postFile,
+	getFile,
+	deleteFile,
+	downloadFile,
+} = require("../controllers/file.controllers");
 const isLoggedIn = require("../middlewares/isLoggedIn.middleware");
 const upload = require("../middlewares/multer.middleware");
+const { apiError } = require("../utils/apiResponse");
 
-router.post("/", isLoggedIn, upload.single("image"), postFile);
+router.post(
+	"/",
+	isLoggedIn,
+	upload.single("image"),
+	(err, req, res, next) => {
+		console.log(err);
+		if (err instanceof multer.MulterError) {
+			if (err.code === "LIMIT_FILE_SIZE") {
+				return res
+					.status(404)
+					.json(apiError("File size is too large. Max limit is 5MB.", false));
+			}
+		}
 
-router.get("/", isLoggedIn, getFile);
+		next();
+	},
+	postFile
+);
+
+router.get("/:fileID", getFile);
+
+router.get("/download/:id", downloadFile);
 
 router.delete("/:id", isLoggedIn, deleteFile);
 

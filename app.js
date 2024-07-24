@@ -24,8 +24,4 @@ const fileRouter = require("./routes/file.routes");
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/files", fileRouter);
 
-// app.get("*", (req, res) => {
-// 	res.send("Welcome, to the server.");
-// });
-
 module.exports = app;
