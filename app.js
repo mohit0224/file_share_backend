@@ -18,7 +18,7 @@ app.use(
 	session({
 		secret: "your-secret-key",
 		resave: false,
-		saveUninitialized: true,
+		saveUninitialized: false,
 		cookie: {
 			domain: "file-share-backend-0mq5.onrender.com",
 			secure: process.env.NODE_ENV === "production", // Use true if on HTTPS
