@@ -13,7 +13,7 @@ app.use(
 	})
 );
 
-log(process.env.CORS_ORIGIN)
+console.log(process.env.CORS_ORIGIN)
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
