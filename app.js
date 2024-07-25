@@ -2,7 +2,6 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const session = require("express-session");
 const path = require("path");
 
 const app = express();
@@ -11,21 +10,6 @@ app.use(
 	cors({
 		origin: process.env.CORS_ORIGIN,
 		credentials: true,
-	})
-);
-
-app.use(
-	session({
-		secret: "your-secret-key",
-		resave: false,
-		saveUninitialized: false,
-		cookie: {
-			httpOnly: true,
-			secure: process.env.NODE_ENV === "production", // Use true if on HTTPS
-			sameSite: "None",
-			domain: "file-share-backend-0mq5.onrender.com",
-			path: "/",
-		},
 	})
 );
 
