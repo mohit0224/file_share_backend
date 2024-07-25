@@ -6,20 +6,14 @@ const path = require("path");
 
 const app = express();
 
-const allowedOrigins = [process.env.CORS_ORIGIN];
+app.use(
+	cors({
+		origin: process.env.CORS_ORIGIN,
+		credentials: true,
+	})
+);
 
-const corsOptions = {
-	origin: function (origin, callback) {
-		if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-			callback(null, true);
-		} else {
-			callback(new Error("Not allowed by CORS"));
-		}
-	},
-	optionsSuccessStatus: 200,
-};
-
-app.use(cors(corsOptions));
+log(process.env.CORS_ORIGIN)
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
