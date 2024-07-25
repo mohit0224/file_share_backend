@@ -4,21 +4,17 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const path = require("path");
 
+const corsOption = {
+	origin: process.env.CORS_ORIGIN,
+	credentials: true,
+};
+
 const app = express();
-console.log(process.env.CORS_ORIGIN)
-
-app.use(
-	cors({
-		origin: process.env.CORS_ORIGIN,
-		credentials: true,
-	})
-);
-
-
+app.use(cookieParser());
+app.use(cors(corsOption));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
-app.use(cookieParser());
 
 // ----------------------------------------------------------------
 const userRouter = require("./routes/user.routes");
