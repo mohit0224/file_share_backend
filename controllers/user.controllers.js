@@ -90,8 +90,8 @@ const userLogin = async (req, res) => {
 		res.cookie("token", token, {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === "production",
-			sameSite: "Strict",
-			domain: "https://file-share-backend-phi.vercel.app",
+			sameSite: "None",
+			domain: "file-share-backend-phi.vercel.app",
 			path: "/",
 			maxAge: 24 * 60 * 60 * 1000,
 		});
@@ -110,8 +110,8 @@ const userLogout = async (req, res) => {
 		res.cookie("token", "", {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === "production",
-			sameSite: "Strict",
-			domain: "https://file-share-backend-phi.vercel.app",
+			sameSite: "None",
+			domain: "file-share-backend-phi.vercel.app",
 			path: "/",
 			maxAge: 0,
 		});
