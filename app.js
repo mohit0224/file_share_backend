@@ -23,6 +23,8 @@ app.use(
 			httpOnly: true,
 			secure: process.env.NODE_ENV === "production", // Use true if on HTTPS
 			sameSite: "None",
+			domain: "file-share-backend-0mq5.onrender.com",
+			path: "/",
 		},
 	})
 );
