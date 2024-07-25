@@ -20,10 +20,8 @@ app.use(
 		resave: false,
 		saveUninitialized: false,
 		cookie: {
-			domain: "file-share-backend-0mq5.onrender.com",
-			secure: process.env.NODE_ENV === "production", // Use true if on HTTPS
 			httpOnly: true,
-			path: "/",
+			secure: process.env.NODE_ENV === "production", // Use true if on HTTPS
 			sameSite: "None",
 		},
 	})
