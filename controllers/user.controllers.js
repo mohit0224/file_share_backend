@@ -91,7 +91,7 @@ const userLogin = async (req, res) => {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === "production",
 			sameSite: "Strict",
-			domain: ".vercel.app",
+			domain: "https://file-share-backend-phi.vercel.app",
 			path: "/",
 			maxAge: 24 * 60 * 60 * 1000,
 		});
@@ -111,7 +111,7 @@ const userLogout = async (req, res) => {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === "production",
 			sameSite: "Strict",
-			domain: ".vercel.app",
+			domain: "https://file-share-backend-phi.vercel.app",
 			path: "/",
 			maxAge: 0,
 		});
