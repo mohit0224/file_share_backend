@@ -87,15 +87,16 @@ const userLogin = async (req, res) => {
 
 		const token = generateToken(user._id);
 
-		return res
+		res.cookie("token", token, {
+			httpOnly: true,
+			self: true,
+			secure: process.env.NODE_ENV === "production",
+			sameSite: "strict",
+			maxAge: 24 * 60 * 60 * 1000,
+		});
+
+		res
 			.status(200)
-			.cookie("token", token, {
-				httpOnly: true,
-				self: true,
-				secure: true,
-				sameSite: "none",
-				maxAge: 24 * 60 * 60 * 1000,
-			})
 			.json(apiResponse("User logged in successfully !!", true, {}));
 	} catch (err) {
 		return res
@@ -106,16 +107,14 @@ const userLogin = async (req, res) => {
 
 const userLogout = async (req, res) => {
 	try {
-		res
-			.status(200)
-			.cookie("token", "", {
-				httpOnly: true,
-				self: true,
-				secure: true,
-				sameSite: "none",
-				maxAge: 0,
-			})
-			.json(apiResponse("logged out successfully !!", true, {}));
+		res.cookie("token", "", {
+			httpOnly: true,
+			self: true,
+			secure: process.env.NODE_ENV === "production",
+			sameSite: "none",
+			maxAge: 0,
+		});
+		res.status(200).json(apiResponse("logged out successfully !!", true, {}));
 	} catch (err) {
 		return res
 			.status(500)
@@ -176,7 +175,9 @@ const updateProfileImage = async (req, res) => {
 
 		const file = req.file;
 		if (!file)
-			return res.status(404).json(apiError("Upload profile image to process !!", false));
+			return res
+				.status(404)
+				.json(apiError("Upload profile image to process !!", false));
 
 		if (user.userImage) {
 			const publicID = extractPublicId(user.userImage);
