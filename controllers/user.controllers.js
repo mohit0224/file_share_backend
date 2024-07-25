@@ -92,8 +92,6 @@ const userLogin = async (req, res) => {
 			secure: process.env.NODE_ENV === "production",
 			sameSite: "None",
 			maxAge: 24 * 60 * 60 * 1000,
-			domain: "file-share-backend-0mq5.onrender.com",
-			path: "/",
 		});
 
 		res
@@ -113,8 +111,6 @@ const userLogout = async (req, res) => {
 			secure: process.env.NODE_ENV === "production",
 			sameSite: "None",
 			maxAge: 0,
-			domain: "file-share-backend-0mq5.onrender.com",
-			path: "/",
 		});
 		res.status(200).json(apiResponse("logged out successfully !!", true, {}));
 	} catch (err) {
