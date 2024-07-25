@@ -92,7 +92,6 @@ const userLogin = async (req, res) => {
 			secure: process.env.NODE_ENV === "production",
 			sameSite: "None",
 			maxAge: 24 * 60 * 60 * 1000,
-			domain: process.env.COOKIES_URL,
 		});
 
 		res
@@ -112,7 +111,6 @@ const userLogout = async (req, res) => {
 			secure: process.env.NODE_ENV === "production",
 			sameSite: "None",
 			maxAge: 0,
-			domain: process.env.COOKIES_URL,
 		});
 		res.status(200).json(apiResponse("logged out successfully !!", true, {}));
 	} catch (err) {
