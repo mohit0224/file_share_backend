@@ -7,6 +7,7 @@ const path = require("path");
 const corsOption = {
 	origin: process.env.CORS_ORIGIN,
 	credentials: true,
+	allowedHeaders: ['Content-Type', 'Authorization'],
 };
 
 const app = express();
