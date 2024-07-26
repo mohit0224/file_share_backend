@@ -70,7 +70,7 @@ const postFile = async (req, res) => {
 			.status(200)
 			.json(
 				apiResponse(
-					"File uploaded successfully, this w'll be deleted after 24 hours !!",
+					"File uploaded successfully, this w'll be deleted after 1 hour !!",
 					true,
 					createdFile
 				)

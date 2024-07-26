@@ -6,33 +6,22 @@ const os = require("os");
 
 const nCpu = os.cpus().length;
 
-// if (cluster.isMaster) {
-// 	for (let i = 0; i < nCpu; i++) {
-// 		cluster.fork();
-// 	}
-// 	cluster.on("exit", (worker, code, signal) => {
-// 		cluster.fork();
-// 	});
-// } else {
-// 	dbConfig()
-// 		.then(() => {
-// 			app.listen(PORT, () => {
-// 				console.log(`Server is listening on port :: ${PORT}`);
-// 			});
-// 		})
-// 		.catch((err) => {
-// 			console.error(err.message);
-// 			process.exit(1);
-// 		});
-// }
-
-dbConfig()
-	.then(() => {
-		app.listen(PORT, () => {
-			console.log(`Server is listening on port :: ${PORT}`);
-		});
-	})
-	.catch((err) => {
-		console.error(err.message);
-		process.exit(1);
+if (cluster.isMaster) {
+	for (let i = 0; i < nCpu; i++) {
+		cluster.fork();
+	}
+	cluster.on("exit", (worker, code, signal) => {
+		cluster.fork();
 	});
+} else {
+	dbConfig()
+		.then(() => {
+			app.listen(PORT, () => {
+				console.log(`Server is listening on port :: ${PORT}`);
+			});
+		})
+		.catch((err) => {
+			console.error(err.message);
+			process.exit(1);
+		});
+}

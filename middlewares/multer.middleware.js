@@ -6,6 +6,7 @@ const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const storage = new CloudinaryStorage({
 	cloudinary: cloudinary,
 	params: async (req, file) => {
+		const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
 		const ext = path.extname(file.originalname).toLowerCase().slice(1);
 		const allowedFormats = ["jpg", "jpeg", "png", "gif", "webp"];
 		if (!allowedFormats.includes(ext)) {
@@ -14,7 +15,7 @@ const storage = new CloudinaryStorage({
 		return {
 			folder: "Image",
 			format: ext,
-			public_id: file.originalname.split(".")[0],
+			public_id: `${file.originalname.split(".")[0]}-${uniqueSuffix}`,
 		};
 	},
 });
