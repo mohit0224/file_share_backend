@@ -91,6 +91,7 @@ const userLogin = async (req, res) => {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === "production",
 			sameSite: "none",
+			domain: "file-share-frontend-nu.vercel.app",
 			maxAge: 24 * 60 * 60 * 1000,
 		});
 		res
@@ -109,6 +110,7 @@ const userLogout = async (req, res) => {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === "production",
 			sameSite: "none",
+			domain: "file-share-frontend-nu.vercel.app",
 			maxAge: 0,
 		});
 		res.status(200).json(apiResponse("logged out successfully !!", true, {}));
