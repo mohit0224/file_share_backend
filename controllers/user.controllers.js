@@ -90,9 +90,7 @@ const userLogin = async (req, res) => {
 		res.cookie("token", token, {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === "production",
-			sameSite: "None",
-			domain: "vercel.app",
-			path: "/api",
+			sameSite: "none",
 			maxAge: 24 * 60 * 60 * 1000,
 		});
 		res
@@ -110,9 +108,7 @@ const userLogout = async (req, res) => {
 		res.cookie("token", "", {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === "production",
-			sameSite: "None",
-			domain: "vercel.app",
-			path: "/api",
+			sameSite: "none",
 			maxAge: 0,
 		});
 		res.status(200).json(apiResponse("logged out successfully !!", true, {}));
