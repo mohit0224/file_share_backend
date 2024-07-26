@@ -25,6 +25,7 @@ const postFile = async (req, res) => {
 		}
 
 		const file = req.file;
+		console.log(file);
 		if (!file)
 			return res.status(404).json(apiError("Upload file to process !!", false));
 
