@@ -7,10 +7,11 @@ const path = require("path");
 const corsOption = {
 	origin: process.env.CORS_ORIGIN,
 	credentials: true,
-	allowedHeaders: ['Content-Type', 'Authorization'],
+	allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 const app = express();
+app.set("trust proxy", 1);
 app.use(cookieParser());
 app.use(cors(corsOption));
 app.use(express.json());
