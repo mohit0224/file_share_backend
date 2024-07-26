@@ -12,7 +12,7 @@ const setTimeOut = ({ publicId, fileID }) => {
 			user.files.splice(user.files.indexOf(fileID), 1);
 			await user.save();
 		}
-	}, 20 * 1000);
+	}, 30 * 1000);
 };
 
 module.exports = setTimeOut;

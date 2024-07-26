@@ -25,7 +25,6 @@ const postFile = async (req, res) => {
 		}
 
 		const file = req.file;
-		console.log("🚀 ~ postFile ~ file:", file)
 		if (!file)
 			return res.status(404).json(apiError("Upload file to process !!", false));
 
@@ -37,14 +36,12 @@ const postFile = async (req, res) => {
 		if (isPasswordProtected === "true") {
 			if (password) {
 				const hash = await hashPassword(password);
-				const { secure_url, original_filename, format } =
-					await cloudinaryUpload(file.path);
-				publicId = extractPublicId(secure_url);
+				publicId = extractPublicId(file.path);
 
 				createFile = new File({
 					userID: id,
-					imageName: `${original_filename}.${format}`,
-					imageURL: secure_url,
+					imageName: file.originalname,
+					imageURL: file.path,
 					password: hash,
 					isPasswordProtected,
 					isFileShareable: isFileShareable || true,
@@ -54,14 +51,11 @@ const postFile = async (req, res) => {
 				return res.status(500).json(apiError("Password is required !!", false));
 			}
 		} else {
-			const { secure_url, original_filename, format } = await cloudinaryUpload(
-				file.path
-			);
-			publicId = extractPublicId(secure_url);
+			publicId = extractPublicId(file.path);
 			createFile = new File({
 				userID: id,
-				imageName: `${original_filename}.${format}`,
-				imageURL: secure_url,
+				imageName: file.originalname,
+				imageURL: file.path,
 				isFileShareable: isFileShareable || true,
 			});
 		}
